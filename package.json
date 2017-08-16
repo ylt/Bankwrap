@@ -1,0 +1,28 @@
+{
+  "name": "librebank-paypal",
+  "version": "1.0.0",
+  "description": "",
+  "repository": "ylt/Librebank",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/node": "^8.0.19",
+    "del": "^3.0.0",
+    "gulp": "^3.9.1",
+    "gulp-sourcemaps": "^2.6.0",
+    "gulp-typescript": "^3.2.1",
+    "merge2": "^1.1.0",
+    "typescript": "^2.4.2"
+  },
+  "dependencies": {
+    "clone": "^2.1.1",
+    "oauth-libre": "^0.9.17",
+    "request": "^2.81.0",
+    "request-promise": "^4.2.1"
+  }
+}
