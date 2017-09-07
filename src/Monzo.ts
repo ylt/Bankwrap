@@ -2,39 +2,53 @@
  * Created by joe on 15/08/17.
  */
 
+require('source-map-support').install();
+
 import * as OAuthLibre from 'oauth-libre';
-const OAuth2 = OAuthLibre.PromiseOAuth2;
+import LazyContent from './LazyContent';
+import OAuth from './OAuth';
 
 
-interface MonzoConf {
+export interface MonzoConf {
     user_agent?: string,
-    client_id?: string,
+    client_id: string,
     client_secret?: string,
     refresh_token?: string,
-    access_token?: string
+    access_token?: string,
+    redirectUri?: string
 }
 
-type Transaction_DeclineReason = "INSUFFICIENT_FUNDS" | "CARD_INACTIVE" | "CARD_BLOCKED" | "OTHER";
+export type Transaction_DeclineReason = "INSUFFICIENT_FUNDS" | "CARD_INACTIVE" | "CARD_BLOCKED" | "OTHER";
 
 
 
-class Monzo {
+export class Monzo {
     private baseUrl;
     public oauth;
 
     constructor(private conf: MonzoConf) {
-
-
+        this.oauth = new OAuth(conf);
 
     }
 
-    getAccounts(): Promise<Account[]> { //opts?
-        return null;
+    getAccounts(type?: null | "uk_retail" | "uk_prepaid"): Promise<Account[]> { //opts?
+        return this.oauth.Request({
+            uri: '/accounts',
+            qs: {
+                'account_type': type
+            }
+        }).then(res => {
+            let list = [];
+            for (let account in res.accounts) {
+                list.push(new Account(account.id, Promise.resolve(account)));
+            }
+            return list;
+        });
     }
 
     getPrepaidAccount() {
         return new Promise((resolve, reject) => {
-            this.getAccounts().then(res => {
+            this.getAccounts(null).then(res => {
                 if (res.length > 0)
                     resolve(res[0]);
                 resolve(null);
@@ -43,7 +57,13 @@ class Monzo {
     }
 
     getCurrentAccount() {
-
+        return new Promise((resolve, reject) => {
+            this.getAccounts(null).then(res => {
+                if (res.length > 0)
+                    resolve(res[0]);
+                resolve(null);
+            });
+        });
     }
 
     getAccount(id) {
@@ -51,23 +71,33 @@ class Monzo {
     }
 }
 
-class Account {
-    //public id: string;
-    public description: string;
+export class Account extends LazyContent {
+    public id: string;
     public created: string;
+    public description: string;
+    public type: string;
+
+    constructor(id, _fetcher) {
+        super(_fetcher);
+        this.id = id;
+    }
+
+    public _fetch() {
+
+    }
 }
 
-class Balance {
+export class Balance {
     public balance: number;
     public currency: string;
     public spend_today: string;
 }
 
-class TransactionsPage {
+export class TransactionsPage {
 
 }
 
-class Transaction {
+export class Transaction {
     public id: string;
     public created: string;
     public description;
@@ -91,7 +121,7 @@ class Transaction {
     public include_in_spending;
 }
 
-class Merchant {
+export class Merchant {
     public id;
     public group_id;
     public created;
@@ -107,7 +137,7 @@ class Merchant {
     public disable_feedback;
 }
 
-class MerchantAddress {
+export class MerchantAddress {
     public short_formatted;
     public formatted;
     public address;
@@ -121,7 +151,7 @@ class MerchantAddress {
     public approximate;
 }
 
-class Limits {
+export class Limits {
     public is_verified: boolean;
     public max_balance: number;
     public verification_type: string;
@@ -159,7 +189,7 @@ class Limits {
     public monthly_inbound_p2p_limit_total: number;
 }
 
-class Card {
+export class Card {
     public id: string;
     public processor_token: string;
     public processor: string;
@@ -171,7 +201,7 @@ class Card {
     public created;
 }
 
-class Profile {
+export class Profile {
     public address: {
         administrative_area: string,
         country: string,
