@@ -11,21 +11,21 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "@types/node": "^8.0.19",
+    "babel-cli": "^6.26.0",
+    "babel-preset-env": "^1.6.0",
     "del": "^3.0.0",
     "gulp": "^3.9.1",
-    "gulp-sourcemaps": "^2.6.0",
-    "gulp-typescript": "^3.2.1",
-    "merge2": "^1.1.0",
-    "typescript": "^2.4.2"
+    "gulp-babel": "^7.0.0",
+    "gulp-sourcemaps": "^2.6.0"
   },
   "dependencies": {
     "bluebird": "^3.5.0",
     "clone": "^2.1.1",
+    "express": "^4.15.4",
     "lodash": "^4.17.4",
-    "oauth-libre": "^0.9.17",
     "promise-chains": "^0.3.12",
     "request": "^2.81.0",
+    "request-debug": "^0.2.0",
     "request-promise": "^4.2.1",
     "source-map-support": "^0.4.17"
   }

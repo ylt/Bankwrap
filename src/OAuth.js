@@ -1,30 +1,29 @@
 /**
  * Created by joe on 15/08/17.
  */
-import * as request from 'request-promise';
-import * as EventEmitter from 'events';
+import request from 'request-promise';
+import EventEmitter from 'events';
 import {includes, merge} from 'lodash';
 import Promise from './Promise';
 
 const MAX_TOKEN_LATENCY = 30;
 
-export interface oauth {
-    client_id,
-    client_secret?,
-    refresh_token?,
-    access_token?,
-    expires_in?,
-    token_expiration?,
-    redirectUri?
-}
+// export interface oauth {
+//     client_id,
+//     client_secret?,
+//     refresh_token?,
+//     access_token?,
+//     expires_in?,
+//     token_expiration?,
+//     redirectUri?
+// }
 
 export default class OAuth {
-    private baseUrl = 'https://api.monzo.com';
-    private emitter = new EventEmitter();
 
-    private accessTokenPromise: Promise<any>;
-
-    constructor(private oauth: oauth) {
+    constructor(oauth) {
+        this.oauth = oauth;
+        this.baseUrl = 'https://api.monzo.com';
+        this.emitter = new EventEmitter();
         if (!oauth.token_expiration && oauth.expires_in) { //convert the relative expires to absolute, based on now..
             oauth.token_expiration = Date.now() + (oauth.expires_in * 1000);
         }
@@ -33,7 +32,7 @@ export default class OAuth {
     }
 
     //only update 1 access token, if already in progress then return promise for existing refresh
-    public updateAccessToken() {
+    updateAccessToken() {
         if (this.accessTokenPromise)
             return this.accessTokenPromise;
 
@@ -68,11 +67,11 @@ export default class OAuth {
         return Promise.resolve(this.oauth.access_token);
     }
 
-    public getAuthUrl() {
+    getAuthUrl() {
         return `https://auth.getmondo.co.uk/?client_id=${this.oauth.client_id}&redirect_uri=${this.oauth.redirectUri}&response_type=code&state=`;
     }
 
-    public exchangeAuth(code) {
+    exchangeAuth(code) {
         return request({
             method: 'post',
             url: this.baseUrl + '/oauth2/token',
@@ -94,24 +93,24 @@ export default class OAuth {
         });
     }
 
-    public toJson() {
+    toJson() {
         return this.oauth;
     }
 
     /* event listener stuff */
-    public on(eventName, listener) {
+    on(eventName, listener) {
         return this.emitter.on(eventName, listener);
     }
 
-    public once(eventName, listener) {
+    once(eventName, listener) {
         return this.emitter.once(eventName, listener);
     }
 
-    public removeListener(eventName, listener) {
+    removeListener(eventName, listener) {
         return this.emitter.removeListener(eventName, listener);
     }
 
-    public Request(options) {
+    Request(options) {
         return Promise.resolve()
             .then(() => this.updateAccessToken())
             .then(() => {
